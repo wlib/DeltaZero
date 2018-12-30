@@ -1,0 +1,195 @@
+<html>
+<head>
+  <title>Try out DeltaZero</title>
+  <style>
+@font-face {
+  font-family: "Inter UI var";
+  font-weight: 400 900;
+  font-style: oblique 0deg 10deg;
+  src: url("https://rsms.me/inter/font-files/Inter-UI.var.woff2?v=3.1") format("woff2-variations"),
+  url("https://rsms.me/inter/font-files/Inter-UI.var.woff2?v=3.1") format("woff2");
+}
+
+html {
+  font-family: "Inter UI var", monospace;
+  font-variation-settings: "wght" 450;
+  font-feature-settings: "salt", "ss02";
+  white-space: pre-wrap;
+  line-height: 9px;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: 0;
+  display: inline;
+  line-height: 25px;
+}
+  </style>
+</head>
+
+<body>
+<h1 style="text-align: center">𝛿₀ - The DeltaZero Language</h1>
+<div>
+  <p>// Functions are everywhere, and in this language, they are very flexible.</p>
+  <p>// This is an introduction to the basics of how functions are made and used.</p>
+  <p>// First, we need to understand what exactly a function is.</p>
+  <br>
+  <p>// The most basic function returns the same thing every time.</p>
+  <p>// This function just returns the number 5:</p>
+  <p>myFunction = fn: 5;</p>
+  <p>// To call this function, we can do this:</p>
+  <p>myFunction();</p>
+  <br>
+  <p>// Now for something more useful...</p>
+  <p>// We can use parameters to make our function work for us.</p>
+  <p>// This is a function that returns whatever you give it:</p>
+  <p>doNothing = fn x: x;</p>
+  <p>doNothing(5); // Returns the number 5</p>
+  <br>
+  <p>// We can also use several parameters.</p>
+  <p>// This function adds the two numbers you give it:</p>
+  <p>add = fn (a, b): a + b;</p>
+  <p>add(1, 2); // Returns 3</p>
+  <br>
+  <p>// What if you don't want to put in all of the parameters?</p>
+  <p>// Use the `?` character as a placeholder:</p>
+  <p>add(1, ?);</p>
+  <p>// This is called partial application, and it can be very useful.</p>
+  <p>addOne = add(1, ?); // Returns fn b: 1 + b</p>
+  <p>addOne(2); // Returns 3</p>
+  <br>
+  <p>// You can put the placeholder anywhere:</p>
+  <p>otherAddOne = add(?, 1); // Returns fn a: a + 1</p>
+  <p>// Note how the functions addOne and otherAddOne are different,</p>
+  <p>// even though they behave the same way mathematically.</p>
+  <p>// The placeholder simply ignores the parameter it is placed on.</p>
+  <br>
+  <p>// There is also one more thing to know,</p>
+  <p>// instead of putting placeholders last, you can ignore the parameters:</p>
+  <p>addOne = add(1); // Returns fn b: 1 + b</p>
+  <br>
+  <p>// That's all fine and dandy, but what can you actually use it for?</p>
+  <p>// Let's make a function that doubles every item in an array of numbers:</p>
+  <p>double = fn n: 2*n;</p>
+  <p>doubleArray = map(double); // Or map(double, ?)</p>
+  <p>doubleArray([1, 2, 3]); // Returns [2, 4, 6]</p>
+  <br>
+  <p>// Now for something a little more complicated.</p>
+  <p>// This finds the sum of all the multiples of 3 or 5 below 1000:</p>
+  <p>multiples = fn n: (n % 3 == 0) || (n % 5 == 0);</p>
+  <p>reduce(add, 0, filter(multiples, [0..999]));</p>
+  <br>
+  <p>// That kinda sucks, you can barely tell what's happening...</p>
+  <p>// How can we call these functions in a way that makes more sense?</p>
+  <p>[0..999] -&gt;</p>
+  <p> &nbsp;filter(multiples) -&gt;</p>
+  <p> &nbsp;reduce(add, 0);</p>
+  <br>
+  <p>// So now we can see the flow of data easily,</p>
+  <p>// the flow arrow, `-&gt;`, puts the value to the left of it into</p>
+  <p>// the function to the right of it. This is the alternative way of calling functions.</p>
+  <br>
+  <p>// Asynchronicity is just a bit different from javascript</p>
+  <p>// These four expressions will simply evaluate in order, as if synchronous</p>
+  <p>res = fetchSomeJSON;</p>
+  <p>res -&gt; console.log;</p>
+  <p>res -&gt; process -&gt; postJSON;</p>
+  <p>res -&gt; doSomethingElse;</p>
+  <br>
+  <p>// We can call any function asynchronously by prefixing with the `go` keyword.</p>
+  <p>// This will call the functions in the same order as before,</p>
+  <p>// but there will be no waiting for the functions to return before moving on.</p>
+  <p>go doWhatever();</p>
+  <p>go doThisToo();</p>
+  <br>
+  <p>// Asynchronous behavior is designed to be almost invisible.</p>
+  <p>// This essentially means that `await` is always implied when you access</p>
+  <p>// an asynchronous return value. You will never have to interact with a promise.</p>
+  <br>
+  <p>/* JS:</p>
+  <p>async function http(url) {</p>
+  <p> &nbsp;const res = await fetch(url);
+    &nbsp;return res.json();
+    }
+  </p>
+  <br>
+  <p>// You can only use `await` within an async function</p>
+  <p>async wrapperFunction() {
+    &nbsp;const json = await http(apiURL);
+    }
+  </p>
+  <p>*/</p>
+  <br>
+  <p>// DeltaZero equivalent:</p>
+  <p>http = fn url: fetch(url).json();</p>
+  <p>json = apiURL -&gt; http;</p>
+  <br>
+  <p>// The one quirk is that if and match are special,</p>
+  <p>// We can write them like functions, but they are more</p>
+  <p>// accurately language constructs.</p>
+  <p>// This is the most basic use of if:</p>
+  <p>if { thisIsTrue: doThis(); };</p>
+  <br>
+  <p>// There is no need to say `then`, `else if`, or `else`:</p>
+  <p>if {</p>
+  <p> &nbsp;thisIsTrue: doThis();</p>
+  <p> &nbsp;elseIfThisIsTrue: thenThis();</p>
+  <p> &nbsp;defaultToThis();</p>
+  <p>};</p>
+  <br>
+  <p>// Nesting works just what you would expect:</p>
+  <p>if {</p>
+  <p> &nbsp;maybe: if {</p>
+  <p> &nbsp;&nbsp;&nbsp;false: this;</p>
+  <p> &nbsp;&nbsp;&nbsp;true: that;</p>
+  <p> &nbsp;};</p>
+  <p> &nbsp;this: that;</p>
+  <p> &nbsp;that;</p>
+  <p>};</p>
+  <br>
+  <p>// This is what `match` looks like:</p>
+  <p>match thisValue withThis: doThis();</p>
+  <br>
+  <p>// Here's an more extended example:</p>
+  <p>price = match fruit {</p>
+  <p> &nbsp;"Oranges": 0.59;</p>
+  <p> &nbsp;"Apples": 0.32;</p>
+  <p> &nbsp;"Bananas": 0.48;</p>
+  <p> &nbsp;"Cherries": 3;</p>
+  <p> &nbsp;"Mangoes", "Papayas": 2.79;</p>
+  <p> &nbsp;`Sorry, we are out of ${fruit}.` -&gt; fail;</p>
+  <p>};</p>
+  <br>
+  <p>// Now realize that `if` is equivalent to `match true`.</p>
+  <p>// Could this also apply to functions?</p>
+  <p>// Of course, check out this factorial function:</p>
+  <p>factorial = fn: match args {</p>
+  <p> &nbsp;0: 1;</p>
+  <p> &nbsp;n: n * factorial(n-1);</p>
+  <p>};</p>
+  <br>
+  <p>// Or more usefully:</p>
+  <p>factorial = fn {</p>
+  <p> &nbsp;0: 1;</p>
+  <p> &nbsp;n: n * factorial(n-1);</p>
+  <p>};</p>
+  <br>
+  <p>// Function guards automatically match and assign to parameters.</p>
+  <p>// This computes the greatest common denominator using Euclid's algorithm.</p>
+  <p>gcd = fn {</p>
+  <p> &nbsp;(a, 0): a;</p>
+  <p> &nbsp;(a, b): gcd(b, a%b);</p>
+  <p>};</p>
+  <br>
+  <p>// Normal Strings</p>
+  <p>"Normal, single line string surrounded by double quotes";</p>
+  <p>'Normal, single line string surrounded by single quotes';</p>
+  <p>// Template Strings</p>
+  <p>`2 + 2 = ${2 + 2}`;</p>
+  <p>`This is a</p>
+  <p>multi-line</p>
+  <p>string`;</p>
+  <br>
+</div>
+</body>
+</html>
